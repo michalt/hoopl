@@ -2,6 +2,9 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, GADTs, EmptyDataDecls, PatternGuards, TypeFamilies, NamedFieldPuns #-}
 module Expr (Expr(..), BinOp(..), Lit(..), Var) where
 
+import qualified Test.QuickCheck.Arbitrary as Arb
+import qualified Test.QuickCheck.Gen as Gen
+
 import PP
 
 data Expr = Lit   Lit
@@ -41,3 +44,19 @@ instance Show BinOp where
   show Lt   = "<"
   show Gte  = ">="
   show Lte  = "<="
+
+instance Arb.Arbitrary Lit where
+  arbitrary = Gen.oneof [genLitBool, genLitInteger]
+
+genLitBool :: Gen.Gen Lit
+genLitBool = do
+  bool <- Arb.arbitrary
+  return $! Bool bool
+
+genLitInteger :: Gen.Gen Lit
+genLitInteger = do
+  int <- Arb.arbitrary
+  return $! Int int
+
+instance Arb.Arbitrary BinOp where
+  arbitrary = Gen.elements [ Add, Sub, Mul, Div, Eq, Ne, Lt, Lte, Gt, Gte ]

@@ -64,6 +64,7 @@ toMid (A.Assign v e) = return $ I.Assign v e
 toMid (A.Store  a e) = return $ I.Store  a e
 
 toLast :: A.Control -> LabelMapM (I.Insn O C)
+-- toLast (A.Branch l)   = if l == "L20" then undefined else labelFor l >>= return . I.Branch
 toLast (A.Branch l)   = labelFor l >>= return . I.Branch
 toLast (A.Cond e t f) = labelFor t >>= \t' ->
                         labelFor f >>= \f' -> return (I.Cond e t' f')

@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, GADTs, EmptyDataDecls, PatternGuards, TypeFamilies, NamedFieldPuns #-}
-module Test (parseTest, evalTest, optTest) where
+module Test (parseTest, evalTest, optTest, constPropPass) where
 
 import Control.Monad.Except
 import System.Exit

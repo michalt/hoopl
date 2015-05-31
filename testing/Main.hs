@@ -1,17 +1,22 @@
 module Main (main) where
 
+import Data.Monoid
+
 import qualified System.FilePath as FilePath
 
 import qualified Test.Framework as Framework
 import qualified Test.Framework.Providers.HUnit as HUnit
+import qualified Test.Framework.Providers.QuickCheck2 as QuickCheck
 
 import qualified Test
+import qualified Properties
 
 main :: IO ()
 main = Framework.defaultMain tests
 
 tests :: [Framework.Test]
-tests = [goldensTests]
+tests = [goldensTests, propertiesTests]
+-- tests = [goldensTests]
 
 -- | All the tests that depend on reading an input file with a simple program,
 -- parsing and optimizing it and then comparing with an expected output.
@@ -38,3 +43,15 @@ goldensTests = Framework.testGroup "Goldens tests"
         , "if-test3"
         , "if-test4"
         ]
+
+propertiesTests :: Framework.Test
+propertiesTests = Framework.testGroup "Property-based tests"
+    [ QuickCheck.testProperty "Optimization doesn't crash"
+          Properties.prop_nothingCrashes
+    , QuickCheck.testProperty "All labels have facts in fwd analysis"
+          Properties.prop_allLabelsHaveFacts
+    , QuickCheck.testProperty "The computation has reached fixpoint"
+          Properties.prop_hasReachedFixpoint
+    , QuickCheck.testProperty "The computation has reached fixpoint"
+          Properties.prop_hasReachedFixpoint
+    ]
