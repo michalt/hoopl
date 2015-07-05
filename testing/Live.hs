@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall -fno-warn-incomplete-patterns #-}
 {-# LANGUAGE ScopedTypeVariables, GADTs #-}
-module Live (liveLattice, liveness, deadAsstElim) where
+module Live (Live, liveLattice, liveness, deadAsstElim) where
 
 import Data.Maybe
 import qualified Data.Set as S
