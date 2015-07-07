@@ -12,7 +12,7 @@ import Compiler.Hoopl
 import IR
 
 -- Evaluation functions
-evalProg :: EvalTarget v => [Proc] -> [v] -> String -> [v] -> ErrorM (State v, [v])
+evalProg :: EvalTarget v => [Proc] -> [v] -> String -> [v] -> (State v, [v])
 evalProg procs vs main args = runProg procs vs $ evalProc main args
 
 evalProc :: EvalTarget v => String -> [v] -> EvalM v [v]

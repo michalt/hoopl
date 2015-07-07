@@ -55,11 +55,11 @@ type B         = Block Insn C C
 type PEnv      = M.Map String Proc
 type G         = Graph Insn C C
 
-runProg :: [Proc] -> [v] -> EvalM v x -> ErrorM (State v, x)
+runProg :: [Proc] -> [v] -> EvalM v x -> (State v, x)
 runProg procs vs (EvalM f) =
   case f init_state of
-    Left (_, e) -> throwError e
-    Right x     -> return x
+    Left (_, e) -> error e
+    Right x     -> x
   where
     init_state = State { frames = [], heap = M.empty, events = [],
                          vsupply = vs, procs = procMap }
