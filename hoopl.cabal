@@ -74,9 +74,7 @@ Library
 Test-Suite hoopl-test
   Default-Language:  Haskell2010
   Type:              exitcode-stdio-1.0
-  Main-Is:           Main.hs
-  Hs-Source-Dirs:    testing src
-  Build-Depends:     base >= 4.3 && < 4.10, 
+  Build-Depends:     base >= 4.3 && < 4.10,
                      containers >= 0.4 && < 0.6,
                      filepath,
                      mtl >= 2.1.3.1,
@@ -84,6 +82,37 @@ Test-Suite hoopl-test
                      test-framework < 0.9,
                      test-framework-hunit < 0.4,
                      mtl >= 2.1.3.1
+  Hs-Source-Dirs:    testing src
+  Main-Is:           Main.hs
+  Other-modules:     Ast
+                   , Ast2ir
+                   , Compiler.Hoopl
+                   , Compiler.Hoopl.Block
+                   , Compiler.Hoopl.Checkpoint
+                   , Compiler.Hoopl.Collections
+                   , Compiler.Hoopl.Combinators
+                   , Compiler.Hoopl.Dataflow
+                   , Compiler.Hoopl.Debug
+                   , Compiler.Hoopl.Fuel
+                   , Compiler.Hoopl.Graph
+                   , Compiler.Hoopl.Label
+                   , Compiler.Hoopl.MkGraph
+                   , Compiler.Hoopl.Pointed
+                   , Compiler.Hoopl.Show
+                   , Compiler.Hoopl.Unique
+                   , Compiler.Hoopl.XUtil
+                   , ConstProp
+                   , Eval
+                   , EvalMonad
+                   , Expr
+                   , IR
+                   , Ir2ast
+                   , Live
+                   , OptSupport
+                   , PP
+                   , Parse
+                   , Simplify
+                   , Test
 
   if flag(testcoverage) 
     Ghc-Options: -fhpc
