@@ -38,8 +38,7 @@ import Compiler.Hoopl.Block
 import Compiler.Hoopl.Collections
 import Compiler.Hoopl.Checkpoint
 import Compiler.Hoopl.Fuel
-import Compiler.Hoopl.Graph hiding (Graph) -- hiding so we can redefine
-                                           -- and include definition in paper
+import Compiler.Hoopl.Graph
 import Compiler.Hoopl.Label
 
 import Control.Monad
@@ -682,7 +681,6 @@ we'll propagate (x=4) to L4, and nuke the otherwise-good rewriting of L4.
 --          TOTALLY internal to Hoopl; each block is decorated with a fact
 -----------------------------------------------------------------------------
 
-type Graph = Graph' Block
 type DG f  = Graph' (DBlock f)
 data DBlock f n e x = DBlock f (Block n e x) -- ^ block decorated with fact
 
