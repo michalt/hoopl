@@ -64,7 +64,7 @@ fromIrInstOO inst p = case inst of
                     }
 
 
-fromIrInstOC :: I.Insn e x -> Rm (A.Lbl, [A.Insn]) -> Rm A.Block
+fromIrInstOC :: I.Insn O C -> Rm (A.Lbl, [A.Insn]) -> Rm A.Block
 fromIrInstOC inst p = case inst of
   I.Branch tl -> do { (l, insts) <- p
                     ; stl <- strLabelFor tl
