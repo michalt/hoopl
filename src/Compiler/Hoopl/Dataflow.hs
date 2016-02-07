@@ -206,22 +206,7 @@ arfGraph pass@FwdPass { fp_lattice = lattice,
                         fp_transfer = transfer,
                         fp_rewrite  = rewrite } entries = graph
   where
-    {- nested type synonyms would be so lovely here 
-    type ARF  thing = forall e x . thing e x -> f        -> m (DG f n e x, Fact x f)
-    type ARFX thing = forall e x . thing e x -> Fact e f -> m (DG f n e x, Fact x f)
-    -}
-    graph ::              Graph n e x -> Fact e f -> m (DG f n e x, Fact x f)
-    block :: forall e x . Block n e x -> f -> m (DG f n e x, Fact x f)
-    node :: forall e x . (ShapeLifter e x) => n e x -> f -> m (DG f n e x, Fact x f)
-    body  :: [Label] -> LabelMap (Block n C C) -> Fact C f -> m (DG f n C C, Fact C f)
-     -- Outgoing factbase is restricted to Labels *not* in
-     -- in the Body; the facts for Labels *in*
-     -- the Body are in the 'DG f n C C'
-    cat :: forall e a x f1 f2 f3. 
-           (f1 -> m (DG f n e a, f2))
-        -> (f2 -> m (DG f n a x, f3))
-        -> (f1 -> m (DG f n e x, f3))
-
+    graph :: Graph n e x -> Fact e f -> m (DG f n e x, Fact x f)
     graph GNil            = \f -> return (dgnil, f)
     graph (GUnit blk)     = block blk
     graph (GMany e bdy x) = (e `ebcat` bdy) `cat` exit x
@@ -240,6 +225,7 @@ arfGraph pass@FwdPass { fp_lattice = lattice,
 #endif
 
     -- Lift from nodes to blocks
+    block :: forall e x. Block n e x -> f -> m (DG f n e x, Fact x f)
     block BNil          = \f -> return (dgnil, f)
     block (BlockCO l b)   = node l `cat` block b
     block (BlockCC l b n) = node l `cat` block b `cat` node n
@@ -250,6 +236,8 @@ arfGraph pass@FwdPass { fp_lattice = lattice,
     block (BSnoc h n)  = block h  `cat` node n
     block (BCons n t)  = node  n  `cat` block t
 
+    node :: forall e x.
+            (ShapeLifter e x) => n e x -> f -> m (DG f n e x, Fact x f)
     node n f
      = do { grw <- frewrite rewrite n f
           ; case grw of
@@ -260,24 +248,33 @@ arfGraph pass@FwdPass { fp_lattice = lattice,
                       f'    = fwdEntryFact n f
                   in  arfGraph pass' (fwdEntryLabel n) g f' }
 
-    -- | Compose fact transformers and concatenate the resulting
-    -- rewritten graphs.
-    {-# INLINE cat #-} 
+    -- Compose fact transformers and concatenate the resulting rewritten graphs.
+    -- Outgoing factbase is restricted to Labels *not* in in the Body; the facts
+    -- for Labels *in* the Body are in the 'DG f n C C'
+    cat :: forall e a x f1 f2 f3.
+           (f1 -> m (DG f n e a, f2))
+        -> (f2 -> m (DG f n a x, f3))
+        -> (f1 -> m (DG f n e x, f3))
     cat ft1 ft2 f = do { (g1,f1) <- ft1 f
                        ; (g2,f2) <- ft2 f1
                        ; return (g1 `dgSplice` g2, f2) }
-    arfx :: forall thing x .
+    {-# INLINE cat #-}
+
+    arfx :: forall thing x.
             NonLocal thing
          => (thing C x ->        f -> m (DG f n C x, Fact x f))
          -> (thing C x -> Fact C f -> m (DG f n C x, Fact x f))
-    arfx arf thing fb = 
+    arfx arf thing fb =
+      -- joinInFacts adds debugging information
       arf thing $ fromJust $ lookupFact (entryLabel thing) $ joinInFacts lattice fb
-     -- joinInFacts adds debugging information
 
 
-     -- Outgoing factbase is restricted to Labels *not* in
-     -- in the Body; the facts for Labels *in*
-     -- the Body are in the 'DG f n C C'
+     -- Outgoing factbase is restricted to Labels *not* in in the Body; the
+     -- facts for Labels *in* the Body are in the 'DG f n C C'
+    body :: [Label]
+         -> LabelMap (Block n C C)
+         -> Fact C f
+         -> m (DG f n C C, Fact C f)
     body entries blockmap init_fbase
       = fixpoint Fwd lattice do_block entries blockmap init_fbase
       where
